@@ -1,6 +1,6 @@
 {
-  "name": "lanerp/laravel-helpers",
-  "description": "lanerp辅助类。",
+  "name": "lanerp/laravel-common",
+  "description": "lanerp公共辅助类。",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -11,7 +11,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Lanerp\\Helpers\\": "src/"
+      "Lanerp\\Common\\": "src/"
     },
     "files": [
       "src/Helpers/Functions.php"

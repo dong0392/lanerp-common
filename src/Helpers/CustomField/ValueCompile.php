@@ -1,8 +1,8 @@
 <?php
 
-namespace Lanerp\Helpers\CustomField;
+namespace Lanerp\Common\Helpers\CustomField;
 
-use Lanerp\Helpers\Strs;
+use Lanerp\Common\Helpers\Strs;
 use App\Models\Customer;
 use App\Models\CustomerContact;
 use App\Models\Department;

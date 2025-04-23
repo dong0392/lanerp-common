@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Helpers\CustomField;
+namespace Lanerp\Common\Helpers\CustomField;
 
 use App\Models\Approval;
 use App\Models\ApprovalFormInfo;

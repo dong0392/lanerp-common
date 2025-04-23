@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Helpers;
+namespace Lanerp\Common\Helpers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;

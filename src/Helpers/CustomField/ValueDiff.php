@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Helpers\CustomField;
+namespace Lanerp\Common\Helpers\CustomField;
 
 
 class ValueDiff

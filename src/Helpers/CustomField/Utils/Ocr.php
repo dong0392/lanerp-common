@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Helpers\CustomField\Utils;
+namespace Lanerp\Common\Helpers\CustomField\Utils;
 
 use AlibabaCloud\SDK\Ocrapi\V20210707\Models\RecognizeBankCardRequest;
 use AlibabaCloud\SDK\Ocrapi\V20210707\Models\RecognizeIdcardRequest;
