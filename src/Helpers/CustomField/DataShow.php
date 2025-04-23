@@ -1,8 +1,8 @@
 <?php
 
-namespace Lanerp\Common\Helpers\CustomField;
+namespace lanerp\common\Helpers\CustomField;
 
-use Lanerp\Common\Helpers\Strs;
+use lanerp\common\Helpers\Strs;
 use App\Models\CustomField;
 use App\Models\CustomForm;
 

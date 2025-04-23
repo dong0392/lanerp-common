@@ -1,9 +1,9 @@
 <?php
 
-namespace Lanerp\Common\Helpers\CustomField;
+namespace lanerp\common\Helpers\CustomField;
 
 
-use Lanerp\Common\Helpers\Arrs;
+use lanerp\common\Helpers\Arrs;
 use App\Models\CustomField;
 use App\Models\CustomFieldFormSnapshot;
 use App\Models\CustomForm;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Common\Helpers\CustomField\Utils\AddressParse;
+namespace lanerp\common\Helpers\CustomField\Utils\AddressParse;
 
 class Address
 {

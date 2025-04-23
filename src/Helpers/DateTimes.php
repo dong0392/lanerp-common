@@ -1,6 +1,6 @@
 <?php
 
-namespace Lanerp\Common\Helpers;
+namespace lanerp\common\Helpers;
 
 
 /**

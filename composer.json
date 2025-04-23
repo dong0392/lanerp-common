@@ -11,7 +11,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Lanerp\\Common\\": "src/"
+      "lanerp\\common\\": "src/"
     },
     "files": [
       "src/Helpers/Functions.php"
