@@ -1,5 +1,5 @@
 {
-  "name": "lanerp/helpers",
+  "name": "lanerp/laravel-helpers",
   "description": "lanerp辅助类。",
   "type": "library",
   "license": "MIT",
