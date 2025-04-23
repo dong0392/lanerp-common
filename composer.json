@@ -14,7 +14,7 @@
       "Lanerp\\Helpers\\": "src/"
     },
     "files": [
-      "src/Functions.php"
+      "src/Helpers/Functions.php"
     ]
   },
   "require": {}
