@@ -1,6 +1,6 @@
 {
   "name": "lanerp/laravel-common",
-  "description": "lanerp公共辅助类",
+  "description": "lanerp公共辅助类。",
   "type": "library",
   "license": "MIT",
   "authors": [
