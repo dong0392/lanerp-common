@@ -3,6 +3,8 @@
 namespace lanerp\common\Helpers;
 
 
+use DateTime;
+
 /**
  * 日期时间类库
  */
@@ -91,5 +93,56 @@ class DateTimes
         $dayOfWeek = date('w', strtotime($date));
         return $weekMap[$dayOfWeek] ?? '-';
     }
+
+    /**
+     * Notes:传参日期距当前日期相差时间格式化
+     * Date: 2025/4/30
+     * @param          $dateString
+     * @param int      $diffValue
+     * @param string   $diffType year month day
+     * @return string|null
+     */
+    public static function formatDateDiff($dateString, int $diffValue = 3, string $diffType = "day"): ?string
+    {
+        if (static::isTimestamp($dateString)) {
+            $dateString = date('Y-m-d H:i:s', $dateString);
+        }
+        //$dateString = "2020-02-26 16:59:00";
+        // 转换输入的日期字符串为 DateTime 对象
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $dateString);
+
+        if ($date === false) return $dateString;
+
+        // 获取当前时间
+        $now = new DateTime();
+
+        // 计算时间差
+        $interval      = $now->diff($date);
+        $isCurrentYear = ($date->format('Y') === $now->format('Y'));
+        $suffix        = $date > $now ? "后" : "前";
+        // 根据时间差生成描述
+        if ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h === 0 && $interval->i < 1) {
+            $dateString = "刚刚";
+        } elseif ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h === 0 && $interval->i >= 1) {
+            $dateString = "{$interval->i}分钟{$suffix}";
+        } elseif ($interval->y === 0 && $interval->m === 0 && $interval->d === 0 && $interval->h >= 1) {
+            $dateString = "{$interval->h}小时{$suffix}";
+        } elseif ($interval->y === 0 && $interval->m === 0 && $interval->d >= 1 && (($diffType === "day" && $interval->d <= $diffValue) || $diffType !== "day")) {
+            $dateString = "{$interval->d}天{$suffix}";
+        } elseif ($interval->y === 0 && $interval->m >= 1 && (($diffType === "month" && $interval->m <= $diffValue) || !in_array($diffType, ["month", "day"]))) {
+            $dateString = "{$interval->m}月{$suffix}";
+        } elseif ($interval->y >= 1 && (($diffType === "year" && $interval->y <= $diffValue) || !in_array($diffType, ["year", "month", "day"]))) {
+            $dateString = "{$interval->y}年{$suffix}";
+        } else {
+            if ($isCurrentYear) {
+                $dateString = $date->format('m-d');//$date->format('n-j');//去掉前导零，月份和日期没有零
+            } else {
+                $dateString = $date->format('Y-m-d');
+            }
+        }
+        //dd($dateString, $interval);
+        return $dateString;
+    }
+
 
 }
