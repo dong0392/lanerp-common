@@ -4,11 +4,8 @@ namespace Lanerp\common\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Log;
 use lanerp\common\Helpers\Arrs;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * This is the model class for table "users".
