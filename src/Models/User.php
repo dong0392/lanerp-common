@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class User extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = ['company_id', 'name', 'phone', 'password', 'avatar', 'email', 'gender', 'openid', 'unionid', 'position', 'department_id', 'superior_id', 'permission_status', 'is_active', 'entry_status', 'extends', 'last_login_time', 'joined_date', 'quit_date', 'deleted_at'];
 
