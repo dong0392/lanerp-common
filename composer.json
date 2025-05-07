@@ -17,5 +17,12 @@
       "src/Helpers/Functions.php"
     ]
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "lanerp\\common\\HelperServiceProvider"
+      ]
+    }
+  },
   "require": {}
 }
