@@ -12,193 +12,207 @@ use Illuminate\Support\Arr;
 
 
 // 加密
-function _openssl_private_encrypt($data)
-{
-    // 已有的私钥和公钥
-    $authorize_license_private_key = env('AUTHORIZE_LICENSE_PRIVATE');
+if (!function_exists('_openssl_private_encrypt')) {
+    function _openssl_private_encrypt($data)
+    {
+        // 已有的私钥和公钥
+        $authorize_license_private_key = env('AUTHORIZE_LICENSE_PRIVATE');
 
-    $os = PHP_OS;
-    if (strpos(strtolower($os), 'win') === 0) {
-        // Windows 操作系统
-        $privateKey = file_get_contents('.' . $authorize_license_private_key);
-    } else {
-        $privateKey = file_get_contents($authorize_license_private_key);
-    }
-
-    if (is_array($data)) {
-        $data = json_encode($data, JSON_UNESCAPED_UNICODE);
-    }
-
-    // 获取 RSA 密钥的长度（单位：字节）
-    $keyLength = openssl_pkey_get_private($privateKey);
-    $keyInfo   = openssl_pkey_get_details($keyLength);
-    $keyLength = $keyInfo['bits'] / 8;
-
-    // 计算分块大小
-    $blockSize = $keyLength - 11;
-
-    // 分块加密
-    $encrypted = '';
-    while ($data) {
-        $chunk  = substr($data, 0, $blockSize);
-        $data   = substr($data, $blockSize);
-        $result = '';
-        if (openssl_private_encrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
-            $encrypted .= $result;
+        $os = PHP_OS;
+        if (strpos(strtolower($os), 'win') === 0) {
+            // Windows 操作系统
+            $privateKey = file_get_contents('.' . $authorize_license_private_key);
         } else {
-            responseErr('Encryption failed: ' . openssl_error_string());
+            $privateKey = file_get_contents($authorize_license_private_key);
         }
-    }
 
-    // 输出加密结果
-    $encryptedData = base64_encode($encrypted);
-    return $encryptedData;
+        if (is_array($data)) {
+            $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        }
+
+        // 获取 RSA 密钥的长度（单位：字节）
+        $keyLength = openssl_pkey_get_private($privateKey);
+        $keyInfo   = openssl_pkey_get_details($keyLength);
+        $keyLength = $keyInfo['bits'] / 8;
+
+        // 计算分块大小
+        $blockSize = $keyLength - 11;
+
+        // 分块加密
+        $encrypted = '';
+        while ($data) {
+            $chunk  = substr($data, 0, $blockSize);
+            $data   = substr($data, $blockSize);
+            $result = '';
+            if (openssl_private_encrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
+                $encrypted .= $result;
+            } else {
+                responseErr('Encryption failed: ' . openssl_error_string());
+            }
+        }
+
+        // 输出加密结果
+        $encryptedData = base64_encode($encrypted);
+        return $encryptedData;
+    }
 }
 
 // 解密-未测
-function _openssl_private_decrypt($encryptedData)
-{
+if (!function_exists('_openssl_private_decrypt')) {
+    function _openssl_private_decrypt($encryptedData)
+    {
 
-    // 已有的私钥和公钥
-    $authorize_license_private_key = env('AUTHORIZE_LICENSE_PRIVATE');
+        // 已有的私钥和公钥
+        $authorize_license_private_key = env('AUTHORIZE_LICENSE_PRIVATE');
 
-    $os = PHP_OS;
-    if (strpos(strtolower($os), 'win') === 0) {
-        // Windows 操作系统
-        $privateKey = file_get_contents('.' . $authorize_license_private_key);
-    } else {
-        $privateKey = file_get_contents($authorize_license_private_key);
-    }
-
-    // 将加密后的数据进行 base64 解码
-    $encrypted = base64_decode($encryptedData);
-
-    // 获取 RSA 密钥的长度（单位：字节）
-    $keyLength = openssl_pkey_get_private($privateKey);
-    $keyInfo   = openssl_pkey_get_details($keyLength);
-    $keyLength = $keyInfo['bits'] / 8;
-
-    // 计算分块大小
-    $blockSize = $keyLength;
-
-    // 分块解密
-    $decrypted = '';
-    while ($encrypted) {
-        $chunk     = substr($encrypted, 0, $blockSize);
-        $encrypted = substr($encrypted, $blockSize);
-        $result    = '';
-        if (openssl_private_decrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
-            $decrypted .= $result;
+        $os = PHP_OS;
+        if (strpos(strtolower($os), 'win') === 0) {
+            // Windows 操作系统
+            $privateKey = file_get_contents('.' . $authorize_license_private_key);
         } else {
-            responseErr('Decryption failed: ' . openssl_error_string());
+            $privateKey = file_get_contents($authorize_license_private_key);
         }
-    }
 
-    // 返回解密后的数据
-    return $decrypted;
-}
+        // 将加密后的数据进行 base64 解码
+        $encrypted = base64_decode($encryptedData);
 
+        // 获取 RSA 密钥的长度（单位：字节）
+        $keyLength = openssl_pkey_get_private($privateKey);
+        $keyInfo   = openssl_pkey_get_details($keyLength);
+        $keyLength = $keyInfo['bits'] / 8;
 
-function check_require($request, $params)
-{
-    $request = $request->all();
-    if (is_array($request) && !empty($params)) {
-        //效验json参数
-        $params = explode(',', $params);
-        foreach ($params as $key => $value) {
-            $value = trim($value);
-            if (!isset($request[$value]) || $request[$value] === '') {
-                exit(responseErr("缺少必传参数: {$value}"));
+        // 计算分块大小
+        $blockSize = $keyLength;
+
+        // 分块解密
+        $decrypted = '';
+        while ($encrypted) {
+            $chunk     = substr($encrypted, 0, $blockSize);
+            $encrypted = substr($encrypted, $blockSize);
+            $result    = '';
+            if (openssl_private_decrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
+                $decrypted .= $result;
+            } else {
+                responseErr('Decryption failed: ' . openssl_error_string());
             }
         }
-        return $request;
+
+        // 返回解密后的数据
+        return $decrypted;
     }
 }
 
-function p(...$args)
-{
-    header('Content-Type: application/json; charset=utf-8');
-
-    foreach ($args as $arg) {
-        if ($arg !== '') {
-            ob_start();
-            var_dump($arg);
-            $output = ob_get_clean();
-            $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-            $output = htmlspecialchars_decode($output, ENT_QUOTES); // 解码 HTML 实体
-            echo $output;
+if (!function_exists('check_require')) {
+    function check_require($request, $params)
+    {
+        $request = $request->all();
+        if (is_array($request) && !empty($params)) {
+            //效验json参数
+            $params = explode(',', $params);
+            foreach ($params as $key => $value) {
+                $value = trim($value);
+                if (!isset($request[$value]) || $request[$value] === '') {
+                    exit(responseErr("缺少必传参数: {$value}"));
+                }
+            }
+            return $request;
         }
     }
-    die;
 }
 
-function get_token()
-{
-    return md5(uniqid(mt_rand(), true));
+if (!function_exists('p')) {
+    function p(...$args)
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        foreach ($args as $arg) {
+            if ($arg !== '') {
+                ob_start();
+                var_dump($arg);
+                $output = ob_get_clean();
+                $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
+                $output = htmlspecialchars_decode($output, ENT_QUOTES); // 解码 HTML 实体
+                echo $output;
+            }
+        }
+        die;
+    }
 }
 
-
-/**
- * Notes:接口返回
- * Date: 2022/10/10
- * @param array  $data
- * @param string $msg
- * @param int    $code
- * @return \Illuminate\Http\JsonResponse|Response
- */
-function responseData($data = "", string $msg = 'success', int $code = 200)
-{
-    header('Content-Type:application/json; charset=utf-8');
-
-    return response()->json([
-        'code'       => $code,
-        'message'    => $msg,
-        'data'       => $data,
-        'serverTime' => date('Y-m-d H:i:s'),
-    ], 200, [], JSON_UNESCAPED_UNICODE);
+if (!function_exists('get_token')) {
+    function get_token()
+    {
+        return md5(uniqid(mt_rand(), true));
+    }
 }
 
-/**
- * Notes:接口返回
- * Date: 2022/10/10
- * @param array  $data
- * @param string $msg
- * @param int    $code
- * @return Application|ResponseFactory|\Illuminate\Http\JsonResponse|Response
- */
-function responseSucc(string $msg = 'success', $data = "", int $code = 200)
-{
-    header('Content-Type:application/json; charset=utf-8');
+if (!function_exists('responseData')) {
+    /**
+     * Notes:接口返回
+     * Date: 2022/10/10
+     * @param array  $data
+     * @param string $msg
+     * @param int    $code
+     * @return \Illuminate\Http\JsonResponse|Response
+     */
+    function responseData($data = "", string $msg = 'success', int $code = 200)
+    {
+        header('Content-Type:application/json; charset=utf-8');
 
-    return response()->json([
-        'code'       => $code,
-        'message'    => $msg,
-        'data'       => $data,
-        'serverTime' => date('Y-m-d H:i:s'),
-    ], 200, [], JSON_UNESCAPED_UNICODE);
+        return response()->json([
+            'code'       => $code,
+            'message'    => $msg,
+            'data'       => $data,
+            'serverTime' => date('Y-m-d H:i:s'),
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
 }
 
-/**
- * Notes:接口返回
- * Date: 2022/10/10
- * @param string     $msg
- * @param int|string $code
- * @param string     $data
- * @return \Illuminate\Http\Response
- */
-function responseErr(string $msg = 'error', int|string $code = -1, $data = "")
-{
-    header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *'); // 允许所有域名访问
-    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS'); // 允许的HTTP方法
-    header('Access-Control-Allow-Headers: Content-Type, Authorization'); // 允许的请求头
-    echo response()->json([
-        'code'       => $code,
-        'message'    => $msg,
-        'data'       => $data,
-        'serverTime' => date('Y-m-d H:i:s'),
-    ], 200, [], JSON_UNESCAPED_UNICODE)->getContent();
-    die;
+if (!function_exists('responseSucc')) {
+    /**
+     * Notes:接口返回
+     * Date: 2022/10/10
+     * @param array  $data
+     * @param string $msg
+     * @param int    $code
+     * @return Application|ResponseFactory|\Illuminate\Http\JsonResponse|Response
+     */
+    function responseSucc(string $msg = 'success', $data = "", int $code = 200)
+    {
+        header('Content-Type:application/json; charset=utf-8');
+
+        return response()->json([
+            'code'       => $code,
+            'message'    => $msg,
+            'data'       => $data,
+            'serverTime' => date('Y-m-d H:i:s'),
+        ], 200, [], JSON_UNESCAPED_UNICODE);
+    }
+}
+
+if (!function_exists('responseErr')) {
+    /**
+     * Notes:接口返回
+     * Date: 2022/10/10
+     * @param string     $msg
+     * @param int|string $code
+     * @param string     $data
+     * @return \Illuminate\Http\Response
+     */
+    function responseErr(string $msg = 'error', int|string $code = -1, $data = "")
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Origin: *'); // 允许所有域名访问
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS'); // 允许的HTTP方法
+        header('Access-Control-Allow-Headers: Content-Type, Authorization'); // 允许的请求头
+        echo response()->json([
+            'code'       => $code,
+            'message'    => $msg,
+            'data'       => $data,
+            'serverTime' => date('Y-m-d H:i:s'),
+        ], 200, [], JSON_UNESCAPED_UNICODE)->getContent();
+        die;
+    }
 }
 
 if (!function_exists('array_keys_search')) {
@@ -387,44 +401,47 @@ if (!function_exists('db_batch_update')) {
     }
 }
 
-function checkVerifyCode($phone_email, $code, $type)
-{
-    if (config('app.env') === "local" && $code === "111111") {
-        return true;
-    }
-    $sendVerifyCode = DB::table('verify_code')->where(['phone_email' => $phone_email, 'type' => $type])->orderBy('id', 'desc')->first();
-    if ($sendVerifyCode) {
-        $send_time = strtotime($sendVerifyCode->create_date);
-        if (($send_time + 24 * 3600) < time()) {
-            return [
-                'msg'  => '验证码已过期，请重新获取',
-                'code' => -1,
-            ];
+if (!function_exists('checkVerifyCode')) {
+    function checkVerifyCode($phone_email, $code, $type)
+    {
+        if (config('app.env') === "local" && $code === "111111") {
+            return true;
         }
-        if ($code != $sendVerifyCode->code) {
+        $sendVerifyCode = DB::table('verify_code')->where(['phone_email' => $phone_email, 'type' => $type])->orderBy('id', 'desc')->first();
+        if ($sendVerifyCode) {
+            $send_time = strtotime($sendVerifyCode->create_date);
+            if (($send_time + 24 * 3600) < time()) {
+                return [
+                    'msg'  => '验证码已过期，请重新获取',
+                    'code' => -1,
+                ];
+            }
+            if ($code != $sendVerifyCode->code) {
+                return [
+                    'msg'  => '验证码不正确，请重新输入',
+                    'code' => -1,
+                ];
+            }
+        } else {
             return [
                 'msg'  => '验证码不正确，请重新输入',
                 'code' => -1,
             ];
         }
-    } else {
-        return [
-            'msg'  => '验证码不正确，请重新输入',
-            'code' => -1,
-        ];
+        return true;
     }
-    return true;
 }
 
-
-function authUser(): ?\App\Models\User
-{
-    return \App\Models\User::auth();
-    //$user               = JWTAuth::user();
-    //$payload            = JWTAuth::payload();
-    //$user->company_name = $payload['company_name'];
-    //$user->company_id   = $payload['company_id'];
-    //return $user;
+if (!function_exists('authUser')) {
+    function authUser(): ?\App\Models\User
+    {
+        return \App\Models\User::auth();
+        //$user               = JWTAuth::user();
+        //$payload            = JWTAuth::payload();
+        //$user->company_name = $payload['company_name'];
+        //$user->company_id   = $payload['company_id'];
+        //return $user;
+    }
 }
 
 if (!function_exists('array_only')) {
@@ -616,18 +633,20 @@ if (!function_exists('setNum')) {
 }
 
 // 判断是否为手机端
-function isMobile()
-{
-    if (isset($_SERVER['HTTP_VIA']) && stristr($_SERVER['HTTP_VIA'], "wap")) {
-        return true;
-    } elseif (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtoupper($_SERVER['HTTP_ACCEPT']), "VND.WAP.WML")) {
-        return true;
-    } elseif (isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])) {
-        return true;
-    } elseif (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/(blackberry|configuration\/cldc|hp |hp-|htc |htc_|htc-|iemobile|kindle|midp|mmp|motorola|mobile|nokia|opera mini|opera |Googlebot-Mobile|YahooSeeker\/M1A1-R2D2|android|iphone|ipod|mobi|palm|palmos|pocket|portalmmm|ppc;|smartphone|sonyericsson|sqh|spv|symbian|treo|up.browser|up.link|vodafone|windows ce|xda |xda_)/i', $_SERVER['HTTP_USER_AGENT'])) {
-        return true;
-    } else {
-        return false;
+if (!function_exists('isMobile')) {
+    function isMobile()
+    {
+        if (isset($_SERVER['HTTP_VIA']) && stristr($_SERVER['HTTP_VIA'], "wap")) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtoupper($_SERVER['HTTP_ACCEPT']), "VND.WAP.WML")) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])) {
+            return true;
+        } elseif (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/(blackberry|configuration\/cldc|hp |hp-|htc |htc_|htc-|iemobile|kindle|midp|mmp|motorola|mobile|nokia|opera mini|opera |Googlebot-Mobile|YahooSeeker\/M1A1-R2D2|android|iphone|ipod|mobi|palm|palmos|pocket|portalmmm|ppc;|smartphone|sonyericsson|sqh|spv|symbian|treo|up.browser|up.link|vodafone|windows ce|xda |xda_)/i', $_SERVER['HTTP_USER_AGENT'])) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -666,9 +685,11 @@ if (!function_exists('getCharsWithPinyin')) {
     }
 }
 
-function _date_diff($enddate, $startdate): float
-{
-    $date = ceil((strtotime($enddate) - strtotime($startdate)) / 86400);
-    return $date;
+if (!function_exists('_date_diff')) {
+    function _date_diff($enddate, $startdate): float
+    {
+        $date = ceil((strtotime($enddate) - strtotime($startdate)) / 86400);
+        return $date;
+    }
 }
 
