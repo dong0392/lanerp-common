@@ -433,9 +433,9 @@ if (!function_exists('checkVerifyCode')) {
 }
 
 if (!function_exists('authUser')) {
-    function authUser(): ?\App\Models\User
+    function authUser(): ?\Lanerp\common\Models\User
     {
-        return \App\Models\User::auth();
+        return \Lanerp\common\Models\User::auth();
         //$user               = JWTAuth::user();
         //$payload            = JWTAuth::payload();
         //$user->company_name = $payload['company_name'];
@@ -463,11 +463,11 @@ if (!function_exists('user')) {
      * Notes:
      * Date: 2025/2/11
      * @param $uid
-     * @return \App\Models\User|null
+     * @return \Lanerp\common\Models\User|null
      */
-    function user($uid = 0, $companyId = null, ?\App\Models\User $user = null)
+    function user($uid = 0, $companyId = null, ?\Lanerp\common\Models\User $user = null)
     {
-        return \App\Models\User::business($uid, $companyId, $user);
+        return \Lanerp\common\Models\User::business($uid, $companyId, $user);
     }
 }
 
