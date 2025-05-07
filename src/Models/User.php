@@ -65,7 +65,7 @@ class User extends Model
     {
         $pkId    = $pkId ?: 'id as user_id';
         $columns = [
-            "default" => [$pkId, 'company_id', 'name', 'phone', 'avatar', 'email', 'gender', 'position', 'department_id', 'superior_id', 'is_active', 'entry_status', 'extends', 'joined_date', 'quit_date'],
+            "default" => [$pkId, 'company_id', 'name', 'phone', 'avatar', 'email', 'gender', 'position', 'department_id', 'superior_id', 'is_active', 'entry_status', 'joined_date', 'quit_date'],
         ];
         $columns = $columns[$type] ?? $columns["default"];
         return Arrs::unshiftPrefix($columns, $prefix);
