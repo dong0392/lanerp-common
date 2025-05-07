@@ -467,7 +467,7 @@ if (!function_exists('user')) {
      */
     function user($uid = 0, $companyId = null, ?\Lanerp\common\Models\User $user = null)
     {
-        return \lanerp\common\Models\User::business($uid, $companyId, $user);
+        return \Lanerp\common\Models\User::business($uid, $companyId, $user);
     }
 }
 
