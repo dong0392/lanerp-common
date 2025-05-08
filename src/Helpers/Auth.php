@@ -39,6 +39,7 @@ class Auth
                 ],  // 发送 JSON 数据
                 'headers' => [
                     'Content-Type' => 'application/json',  // 设置请求头
+                    'uid' => $uid,
                 ]
             ]);
             $modulePermission = json_decode($response->getBody(), true)["result"] ?? [];
@@ -53,13 +54,13 @@ class Auth
         static $userRanges;
 
         $module = static::moduleByPermission($permission, $module);
-        $uid    = $uid ?? user()->id;
-        $key    = "{$permission}:{$module}:$uid";
+        $uid = $uid ?? user()->id;
+        $key = "{$permission}:{$module}:$uid";
         if (isset($userRanges[$key])) {
             $userRange = $userRanges[$key];
         } else {
-            $range            = static::userModuleRange($module, $uid)[$permission] ?? ["isAll" => false, "user_ids" => [], "stock_ids" => []];
-            $userRange        = [$range["isAll"], $range["user_ids"], $range["stock_ids"]];
+            $range = static::userModuleRange($module, $uid)[$permission] ?? ["isAll" => false, "user_ids" => [], "stock_ids" => []];
+            $userRange = [$range["isAll"], $range["user_ids"], $range["stock_ids"]];
             $userRanges[$key] = $userRange;
         }
         return $userRange;
