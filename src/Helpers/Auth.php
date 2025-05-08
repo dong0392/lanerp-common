@@ -2,8 +2,8 @@
 
 namespace lanerp\common\Helpers;
 
-use App\Services\Api\Auth\PermissionService;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+use Sajya\Client\Client;
 
 /**
  * 权限辅助类
@@ -27,23 +27,11 @@ class Auth
         if (isset($modulePermissions[$key])) {
             $modulePermission = $modulePermissions[$key];
         } else {
-            $client = new Client();
-            $response = $client->request('POST', config('app.domain_url') . "/v1/oa", [
-                'json' => [
-                    'jsonrpc' => '2.0',
-                    'method' => 'oa@userPermissions',
-                    'params' => [
-                        'module' => $module  // 将动态的 $module 参数放入请求
-                    ],
-                    'id' => 1
-                ],  // 发送 JSON 数据
-                'headers' => [
-                    'Content-Type' => 'application/json',  // 设置请求头
-                    'uid' => $uid,
-                ]
-            ]);
-            $modulePermission = json_decode($response->getBody(), true)["result"] ?? [];
-            $modulePermissions[$key] = $modulePermission;
+            $modulePermission = (new Client(
+                Http::baseUrl(config('app.domain_url') . "/v1/oa")->withHeader("uid", $uid)
+            ))
+                ->execute('oa@userPermissions', ['module' => $module]);
+            $modulePermissions[$key] = $modulePermission->result();
         }
         return $modulePermission;
     }
