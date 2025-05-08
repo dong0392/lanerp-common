@@ -27,11 +27,12 @@ class Auth
         if (isset($modulePermissions[$key])) {
             $modulePermission = $modulePermissions[$key];
         } else {
-            $modulePermission = (new Client(
+            $response = (new Client(
                 Http::baseUrl(config('app.domain_url') . "/v1/oa")->withHeader("uid", $uid)
             ))
                 ->execute('oa@userPermissions', ['module' => $module]);
-            $modulePermissions[$key] = $modulePermission->result();
+            $modulePermission = $response->result();
+            $modulePermissions[$key] = $modulePermission;
         }
         return $modulePermission;
     }
