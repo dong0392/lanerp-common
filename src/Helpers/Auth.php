@@ -3,6 +3,7 @@
 namespace lanerp\common\Helpers;
 
 use App\Services\Api\Auth\PermissionService;
+use GuzzleHttp\Client;
 
 /**
  * 权限辅助类
@@ -21,12 +22,26 @@ class Auth
     public static function userModuleRange($module, $uid = null)
     {
         static $modulePermissions;
-        $uid = $uid ?? authUser()->id;
+        $uid = $uid ?? user()->id;
         $key = "{$module}:$uid";
         if (isset($modulePermissions[$key])) {
             $modulePermission = $modulePermissions[$key];
         } else {
-            $modulePermission        = PermissionService::getUserPermissionsOperate($module);//查非当前人权限加$uid
+            $client = new Client();
+            $response = $client->request('POST', config('app.domain_url') . "/v1/oa", [
+                'json' => [
+                    'jsonrpc' => '2.0',
+                    'method' => 'oa@userPermissions',
+                    'params' => [
+                        'module' => $module  // 将动态的 $module 参数放入请求
+                    ],
+                    'id' => 1
+                ],  // 发送 JSON 数据
+                'headers' => [
+                    'Content-Type' => 'application/json',  // 设置请求头
+                ]
+            ]);
+            $modulePermission = json_decode($response->getBody(), true)["result"] ?? [];
             $modulePermissions[$key] = $modulePermission;
         }
         return $modulePermission;
@@ -38,7 +53,7 @@ class Auth
         static $userRanges;
 
         $module = static::moduleByPermission($permission, $module);
-        $uid    = $uid ?? authUser()->id;
+        $uid    = $uid ?? user()->id;
         $key    = "{$permission}:{$module}:$uid";
         if (isset($userRanges[$key])) {
             $userRange = $userRanges[$key];
