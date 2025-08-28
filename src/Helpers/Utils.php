@@ -288,4 +288,20 @@ class Utils
     {
         return $originalAmount != 0 ? floor($convertedAmount / $originalAmount * $amount * 100) / 100 : $amount;
     }
+
+    public static function requestMergeExportParams()
+    {
+        /* @var Client $redis */
+        $redis = Redis::connection();
+        $redis->select(10);
+        $redisKey = "export:" . request()->route('key');
+        if (!$data = $redis->get($redisKey)) {
+            _throwException("密匙已失效，请重新导出。");
+        }
+        $redis->del($redisKey);//连续导出的话可以注掉
+        $data = json_decode($data, true) ?? [];
+        user($data["uid"]);
+        app('request')->merge($data["params"] ?? []);
+        return;
+    }
 }
