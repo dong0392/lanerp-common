@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\CoordTransform;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
@@ -9,6 +10,7 @@ use JetBrains\PhpStorm\ArrayShape;
 use Overtrue\Pinyin\Pinyin;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
 
 
 // 加密
@@ -404,7 +406,7 @@ if (!function_exists('db_batch_update')) {
 if (!function_exists('checkVerifyCode')) {
     function checkVerifyCode($phone_email, $code, $type)
     {
-        if (config('app.env') === "local" && $code === "111111") {
+        if (in_array(config('app.env'), ["local", "test"]) && $code === "111111") {
             return true;
         }
         $sendVerifyCode = DB::table('verify_code')->where(['phone_email' => $phone_email, 'type' => $type])->orderBy('id', 'desc')->first();
@@ -433,9 +435,9 @@ if (!function_exists('checkVerifyCode')) {
 }
 
 if (!function_exists('authUser')) {
-    function authUser(): ?\Lanerp\common\Models\User
+    function authUser(): ?\App\Models\User
     {
-        return \Lanerp\common\Models\User::auth();
+        return \App\Models\User::auth();
         //$user               = JWTAuth::user();
         //$payload            = JWTAuth::payload();
         //$user->company_name = $payload['company_name'];
@@ -463,11 +465,11 @@ if (!function_exists('user')) {
      * Notes:
      * Date: 2025/2/11
      * @param $uid
-     * @return \Lanerp\common\Models\User|null
+     * @return \App\Models\User|null
      */
-    function user($uid = 0, $companyId = null, ?\Lanerp\common\Models\User $user = null)
+    function user($uid = 0, $companyId = null, ?\App\Models\User $user = null)
     {
-        return \lanerp\common\Models\User::business($uid, $companyId, $user);
+        return \App\Models\User::business($uid, $companyId, $user);
     }
 }
 
@@ -621,14 +623,15 @@ if (!function_exists('getTimeAgo')) {
 
 // 生成序列号
 if (!function_exists('setNum')) {
-    function setNum($sign, $object_id = '')
+    function setNum($sign, $object_id = '', $dateY = false, $num = 5)
     {
+        $date = $dateY ? date('Ymd') : date('ymd');
         $sign = strtoupper(trim($sign));
-        if (strlen($object_id) > 5) {
-            return $sign . '-' . date("ymd") . $object_id;
+        if (strlen($object_id) > $num) {
+            return $sign . '-' . $date . $object_id;
         }
 
-        return $sign . '-' . date("ymd") . sprintf('%05s', $object_id);
+        return $sign . '-' . $date . sprintf('%0' . $num . 's', $object_id);
     }
 }
 
@@ -693,3 +696,116 @@ if (!function_exists('_date_diff')) {
     }
 }
 
+if (!function_exists('dbTable')) {
+    function dbTable(string $table, string $db = "enlightv"): \Illuminate\Database\Eloquent\Builder
+    {
+        // 动态创建一个 Eloquent 模型实例
+        $model = new class extends Model {
+            protected $table      = '';
+            protected $connection = '';
+            public    $timestamps = false;
+            protected $casts      = [
+                'extends' => 'json',
+            ];
+
+            public function init($table = "", $db = "")
+            {
+                $this->table      = $table;
+                $this->connection = $db;
+            }
+        };
+        $model->init($table, $db);
+        return $model->newQuery();
+    }
+}
+
+if (!function_exists('map_table')) {
+    function map_table($table, $company_id)
+    {
+        return DB::table('map_table')->where('company_id', $company_id)->where('table', $table)->pluck('new_id', 'old_id')->toArray();
+    }
+}
+
+if (!function_exists('deepSort')) {
+    function deepSort(&$array) {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                deepSort($value);
+            }
+        }
+        ksort($array);
+    }
+}
+
+function getFileInfo($url)
+{
+    // 初始化cURL会话
+    $ch = curl_init($url);
+
+    // 设置cURL选项
+    curl_setopt($ch, CURLOPT_NOBODY, true); // 不下载文件，只获取头部
+    curl_setopt($ch, CURLOPT_HEADER, true);  // 包含头部信息
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    // 执行请求
+    $response = curl_exec($ch);
+
+    // 初始化返回数组
+    $file_info = [
+        'file_size' => null,
+        'file_type' => null
+    ];
+
+    // 提取文件大小
+    if (preg_match('/Content-length: (\d+)/i', $response, $matches)) {
+        $file_info['file_size'] = format_size($matches[1]);  // 格式化大小
+    }
+
+    // 提取文件类型，仅获取Content-Type值
+    if (preg_match('/Content-Type:\s*([^\s;]+)/i', $response, $matches)) {
+        $file_info['file_type'] = $matches[1];  // 只保留文件类型（例如 image/jpeg）
+    }
+
+    // 关闭cURL会话
+    curl_close($ch);
+
+    // 返回文件信息
+    return $file_info;
+}
+
+/**
+ * 将字节数转换为人类可读的格式
+ *
+ * @param int $size 字节数
+ * @return string 格式化后的文件大小
+ */
+function format_size($bytes)
+{
+    // 文件大小格式化函数
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    $size  = $bytes;
+    $unit  = 0;
+
+    while ($size >= 1024 && $unit < count($units) - 1) {
+        $size /= 1024;
+        $unit++;
+    }
+    return round($size, 2) . ' ' . $units[$unit];
+}
+
+
+// gps坐标转换百度坐标
+function gps_to_baidu($lon, $lat)
+{
+    // convert wgs84 to cj02
+    $cj02 = CoordTransform::wgs84ToGcj02($lon, $lat);
+    // convert cj02 to bd09
+    return CoordTransform::gcj02ToBd09($cj02[0], $cj02[1]);
+}
+
+// gps坐标转换高德坐标
+function gps_to_amap($lon, $lat)
+{
+    // convert wgs84 to cj02
+    return CoordTransform::wgs84ToGcj02($lon, $lat);
+}
