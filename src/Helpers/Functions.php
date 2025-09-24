@@ -34,7 +34,7 @@ if (!function_exists('_openssl_private_encrypt')) {
 
         // 获取 RSA 密钥的长度（单位：字节）
         $keyLength = openssl_pkey_get_private($privateKey);
-        $keyInfo   = openssl_pkey_get_details($keyLength);
+        $keyInfo = openssl_pkey_get_details($keyLength);
         $keyLength = $keyInfo['bits'] / 8;
 
         // 计算分块大小
@@ -43,8 +43,8 @@ if (!function_exists('_openssl_private_encrypt')) {
         // 分块加密
         $encrypted = '';
         while ($data) {
-            $chunk  = substr($data, 0, $blockSize);
-            $data   = substr($data, $blockSize);
+            $chunk = substr($data, 0, $blockSize);
+            $data = substr($data, $blockSize);
             $result = '';
             if (openssl_private_encrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
                 $encrypted .= $result;
@@ -80,7 +80,7 @@ if (!function_exists('_openssl_private_decrypt')) {
 
         // 获取 RSA 密钥的长度（单位：字节）
         $keyLength = openssl_pkey_get_private($privateKey);
-        $keyInfo   = openssl_pkey_get_details($keyLength);
+        $keyInfo = openssl_pkey_get_details($keyLength);
         $keyLength = $keyInfo['bits'] / 8;
 
         // 计算分块大小
@@ -89,9 +89,9 @@ if (!function_exists('_openssl_private_decrypt')) {
         // 分块解密
         $decrypted = '';
         while ($encrypted) {
-            $chunk     = substr($encrypted, 0, $blockSize);
+            $chunk = substr($encrypted, 0, $blockSize);
             $encrypted = substr($encrypted, $blockSize);
-            $result    = '';
+            $result = '';
             if (openssl_private_decrypt($chunk, $result, $privateKey, OPENSSL_PKCS1_PADDING)) {
                 $decrypted .= $result;
             } else {
@@ -152,9 +152,9 @@ if (!function_exists('responseData')) {
     /**
      * Notes:接口返回
      * Date: 2022/10/10
-     * @param array  $data
+     * @param array $data
      * @param string $msg
-     * @param int    $code
+     * @param int $code
      * @return \Illuminate\Http\JsonResponse|Response
      */
     function responseData($data = "", string $msg = 'success', int $code = 200)
@@ -162,9 +162,9 @@ if (!function_exists('responseData')) {
         header('Content-Type:application/json; charset=utf-8');
 
         return response()->json([
-            'code'       => $code,
-            'message'    => $msg,
-            'data'       => $data,
+            'code' => $code,
+            'message' => $msg,
+            'data' => $data,
             'serverTime' => date('Y-m-d H:i:s'),
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }
@@ -174,9 +174,9 @@ if (!function_exists('responseSucc')) {
     /**
      * Notes:接口返回
      * Date: 2022/10/10
-     * @param array  $data
+     * @param array $data
      * @param string $msg
-     * @param int    $code
+     * @param int $code
      * @return Application|ResponseFactory|\Illuminate\Http\JsonResponse|Response
      */
     function responseSucc(string $msg = 'success', $data = "", int $code = 200)
@@ -184,9 +184,9 @@ if (!function_exists('responseSucc')) {
         header('Content-Type:application/json; charset=utf-8');
 
         return response()->json([
-            'code'       => $code,
-            'message'    => $msg,
-            'data'       => $data,
+            'code' => $code,
+            'message' => $msg,
+            'data' => $data,
             'serverTime' => date('Y-m-d H:i:s'),
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }
@@ -196,9 +196,9 @@ if (!function_exists('responseErr')) {
     /**
      * Notes:接口返回
      * Date: 2022/10/10
-     * @param string     $msg
+     * @param string $msg
      * @param int|string $code
-     * @param string     $data
+     * @param string $data
      * @return \Illuminate\Http\Response
      */
     function responseErr(string $msg = 'error', int|string $code = -1, $data = "")
@@ -208,9 +208,9 @@ if (!function_exists('responseErr')) {
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS'); // 允许的HTTP方法
         header('Access-Control-Allow-Headers: Content-Type, Authorization'); // 允许的请求头
         echo response()->json([
-            'code'       => $code,
-            'message'    => $msg,
-            'data'       => $data,
+            'code' => $code,
+            'message' => $msg,
+            'data' => $data,
             'serverTime' => date('Y-m-d H:i:s'),
         ], 200, [], JSON_UNESCAPED_UNICODE)->getContent();
         die;
@@ -220,8 +220,8 @@ if (!function_exists('responseErr')) {
 if (!function_exists('array_keys_search')) {
     /**
      * 获取键对应的值
-     * @param array  $array 源数组
-     * @param array  $keys  要提取的键数组
+     * @param array $array 源数组
+     * @param array $keys 要提取的键数组
      * @param string $index 二维组中指定提取的字段（唯一）
      * @return array
      */
@@ -264,9 +264,9 @@ if (!function_exists('db_batch_update')) {
         } else {
             $sql = 'UPDATE ' . (DB::getTablePrefix()) . $table_name;
         }
-        $con     = [];
+        $con = [];
         $con_sql = [];
-        $fields  = [];
+        $fields = [];
         foreach ($data as $key => $value) {
             $x = 0;
             foreach ($value as $k => $v) {
@@ -276,7 +276,7 @@ if (!function_exists('db_batch_update')) {
                     $con[$x] = " {$k} = (CASE {$field} ";
                 }
                 if ($k != $field) {
-                    $temp        = $value[$field];
+                    $temp = $value[$field];
                     $con_sql[$x] = $con_sql[$x] ?? '';
                     $con_sql[$x] .= " WHEN '{$temp}' THEN '{$v}' ";
                     $x++;
@@ -344,23 +344,23 @@ if (!function_exists('db_batch_update')) {
         //$url = 'http://39.107.242.113:7862/sms';  //必填--发送连接地址URL
         // $url='https://api.juhedx.com/sms';  //必填--发送连接地址URL
         $url = config('sms.juhe.url');
-        $ch  = curl_init($url);
+        $ch = curl_init($url);
 
         // 记录响应报文的文件绝对路劲
         //$fp = fopen("d:\\example_homepage.txt", "w");
 
         // 请求参数 &key1=value1&key2=value2格式的字符串
         $post_data = array(
-            'account'  => config('sms.juhe.account'),       //必填--用户帐号
+            'account' => config('sms.juhe.account'),       //必填--用户帐号
             'password' => config('sms.juhe.password'),         //必填--用户密码
             // 'content' => '【壹号仓AVL】 您好，您提交的订单已被确认，请前往小程序个人中心查看并处理。',     //短信内容
-            'content'  => '【北京澜景科技有限公司】' . $content,     //短信内容
-            'mobile'   => $phone,  //必填--发信发送的目的号码.多个号码之间用半角逗号隔开,最多500个号码
-            'extno'    => '10690565865',           //必填--接入号，即SP服务号（106XXXXXX）账号摘要里查看:接入码只是10690的话可以不必填,否则都要填写
-            'rt'       => 'json'  //非必填--响应数据类型  用户可根据需要自行选择,比如json,xml,不填默认xml
+            'content' => '【北京澜景科技有限公司】' . $content,     //短信内容
+            'mobile' => $phone,  //必填--发信发送的目的号码.多个号码之间用半角逗号隔开,最多500个号码
+            'extno' => '10690565865',           //必填--接入号，即SP服务号（106XXXXXX）账号摘要里查看:接入码只是10690的话可以不必填,否则都要填写
+            'rt' => 'json'  //非必填--响应数据类型  用户可根据需要自行选择,比如json,xml,不填默认xml
         );
-        $action    = 'send';   //必填--action固定send
-        $str       = 'action=' . $action;
+        $action = 'send';   //必填--action固定send
+        $str = 'action=' . $action;
         foreach ($post_data as $k => $v) {
             $str .= '&' . $k . '=' . urlencode($v);
         }
@@ -414,19 +414,19 @@ if (!function_exists('checkVerifyCode')) {
             $send_time = strtotime($sendVerifyCode->create_date);
             if (($send_time + 24 * 3600) < time()) {
                 return [
-                    'msg'  => '验证码已过期，请重新获取',
+                    'msg' => '验证码已过期，请重新获取',
                     'code' => -1,
                 ];
             }
             if ($code != $sendVerifyCode->code) {
                 return [
-                    'msg'  => '验证码不正确，请重新输入',
+                    'msg' => '验证码不正确，请重新输入',
                     'code' => -1,
                 ];
             }
         } else {
             return [
-                'msg'  => '验证码不正确，请重新输入',
+                'msg' => '验证码不正确，请重新输入',
                 'code' => -1,
             ];
         }
@@ -450,7 +450,7 @@ if (!function_exists('array_only')) {
     /**
      * Get a subset of the items from the given array.
      *
-     * @param array        $array
+     * @param array $array
      * @param array|string $keys
      * @return array
      */
@@ -467,7 +467,7 @@ if (!function_exists('user')) {
      * @param $uid
      * @return \App\Models\User|null
      */
-    function user($uid = 0, $companyId = null, ?\App\Models\User $user = null)
+    function user($uid = null, $companyId = null, ?\App\Models\User $user = null)
     {
         return \App\Models\User::business($uid, $companyId, $user);
     }
@@ -543,7 +543,7 @@ if (!function_exists('listToTree')) {
             return [];
         }
 
-        $tree  = [];
+        $tree = [];
         $refer = [];
 
         foreach ($list as $key => $data) {
@@ -556,7 +556,7 @@ if (!function_exists('listToTree')) {
                 $tree[] =& $list[$key];
             } else {
                 if (isset($refer[$parentId])) {
-                    $parent           =& $refer[$parentId];
+                    $parent =& $refer[$parentId];
                     $parent[$child][] =& $list[$key];
                 }
             }
@@ -590,10 +590,10 @@ if (!function_exists('getTimeAgo')) {
         $interval = $currentDate->diff($commentDate);
 
         // 获取时间差的各个部分
-        $year   = $interval->y;   // 年份
-        $month  = $interval->m;   // 月份
-        $day    = $interval->d;   // 天数
-        $hour   = $interval->h;   // 小时数
+        $year = $interval->y;   // 年份
+        $month = $interval->m;   // 月份
+        $day = $interval->d;   // 天数
+        $hour = $interval->h;   // 小时数
         $minute = $interval->i;   // 分钟数
         $second = $interval->s;   // 秒数
 
@@ -661,7 +661,7 @@ if (!function_exists('getCharsWithPinyin')) {
         if (empty($str)) {
             return '';
         }
-        $result    = '';
+        $result = '';
         $strLength = mb_strlen($str); // 获取字符串的长度
         // 限制处理的最大字符数
         $maxLength = ($length === null) ? $strLength : min($length, $strLength);
@@ -670,9 +670,9 @@ if (!function_exists('getCharsWithPinyin')) {
             // 判断字符是否为中文
             if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $char)) {
                 // 如果是中文，使用Pinyin类转换为拼音并取首字母
-                $pinyin      = new Pinyin();
+                $pinyin = new Pinyin();
                 $firstLetter = $pinyin::abbr($char);  // 获取拼音
-                $result      .= strtoupper(substr($firstLetter, 0, 1)); // 转为大写并添加到结果中
+                $result .= strtoupper(substr($firstLetter, 0, 1)); // 转为大写并添加到结果中
             } // 如果是英文字符，则直接转换为大写字母
             elseif (preg_match('/^[a-zA-Z]+$/', $char)) {
                 $result .= strtoupper($char); // 转为大写并添加到结果中
@@ -701,16 +701,16 @@ if (!function_exists('dbTable')) {
     {
         // 动态创建一个 Eloquent 模型实例
         $model = new class extends Model {
-            protected $table      = '';
+            protected $table = '';
             protected $connection = '';
-            public    $timestamps = false;
-            protected $casts      = [
+            public $timestamps = false;
+            protected $casts = [
                 'extends' => 'json',
             ];
 
             public function init($table = "", $db = "")
             {
-                $this->table      = $table;
+                $this->table = $table;
                 $this->connection = $db;
             }
         };
@@ -727,7 +727,8 @@ if (!function_exists('map_table')) {
 }
 
 if (!function_exists('deepSort')) {
-    function deepSort(&$array) {
+    function deepSort(&$array)
+    {
         foreach ($array as &$value) {
             if (is_array($value)) {
                 deepSort($value);
@@ -783,8 +784,8 @@ function format_size($bytes)
 {
     // 文件大小格式化函数
     $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    $size  = $bytes;
-    $unit  = 0;
+    $size = $bytes;
+    $unit = 0;
 
     while ($size >= 1024 && $unit < count($units) - 1) {
         $size /= 1024;
