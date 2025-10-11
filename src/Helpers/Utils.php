@@ -310,10 +310,18 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
-     * @return int
      */
     public static function addTodo($companyId, $uid, $type, $bizId)
     {
+        $exists = DB::table('todos')->where([
+            'uid' => $uid,
+            'type' => $type,
+            'biz_id' => $bizId,
+        ])->whereIn('status', [Todo::STATUS_PENDING, Todo::STATUS_DONE])->exists();
+        if ($exists) {
+            return false;
+        }
+
         DB::table('todos')->insert([
             'company_id' => $companyId,
             'uid' => $uid,
@@ -331,7 +339,6 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
-     * @return int
      */
     public static function todoDone($uid, $type, $bizId)
     {
@@ -339,6 +346,7 @@ class Utils
             'uid' => $uid,
             'type' => $type,
             'biz_id' => $bizId,
+            'status' => Todo::STATUS_PENDING,
         ])->update([
             'status' => Todo::STATUS_DONE,
             'completed_at' => now(),
@@ -352,7 +360,6 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
-     * @return int
      */
     public static function todoCancel($uid, $type, $bizId)
     {
@@ -360,6 +367,25 @@ class Utils
             'uid' => $uid,
             'type' => $type,
             'biz_id' => $bizId,
+            'status' => Todo::STATUS_PENDING,
+        ])->update([
+            'status' => Todo::STATUS_CANCEL,
+            'updated_at' => now(),
+        ]);
+        return true;
+    }
+
+    /**
+     * 待办通过bizId取消
+     * @param $type
+     * @param $bizId
+     */
+    public static function todoCancelByBizId($type, $bizId)
+    {
+        DB::table('todos')->where([
+            'type' => $type,
+            'biz_id' => $bizId,
+            'status' => Todo::STATUS_PENDING,
         ])->update([
             'status' => Todo::STATUS_CANCEL,
             'updated_at' => now(),
