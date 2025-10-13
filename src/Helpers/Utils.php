@@ -310,12 +310,14 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
+     * @return int
      */
-    public static function addTodo($companyId, $uid, $type, $bizId)
+    public static function addTodo($companyId, $uid, $type, $subType, $bizId)
     {
         $exists = DB::table('todos')->where([
             'uid' => $uid,
             'type' => $type,
+            'sub_type' => $subType,
             'biz_id' => $bizId,
         ])->whereIn('status', [Todo::STATUS_PENDING, Todo::STATUS_DONE])->exists();
         if ($exists) {
@@ -326,6 +328,7 @@ class Utils
             'company_id' => $companyId,
             'uid' => $uid,
             'type' => $type,
+            'sub_type' => $subType,
             'biz_id' => $bizId,
             'status' => Todo::STATUS_PENDING,
             'created_at' => now(),
@@ -339,12 +342,29 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
+     * @return int
      */
-    public static function todoDone($uid, $type, $bizId)
+    public static function todoDone($uid, $type, $subType, $bizId)
     {
         DB::table('todos')->where([
             'uid' => $uid,
             'type' => $type,
+            'sub_type' => $subType,
+            'biz_id' => $bizId,
+            'status' => Todo::STATUS_PENDING,
+        ])->update([
+            'status' => Todo::STATUS_DONE,
+            'completed_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return true;
+    }
+
+    public static function todoDoneByBizId($type, $subType, $bizId)
+    {
+        DB::table('todos')->where([
+            'type' => $type,
+            'sub_type' => $subType,
             'biz_id' => $bizId,
             'status' => Todo::STATUS_PENDING,
         ])->update([
@@ -360,12 +380,14 @@ class Utils
      * @param $uid
      * @param $type
      * @param $bizId
+     * @return int
      */
-    public static function todoCancel($uid, $type, $bizId)
+    public static function todoCancel($uid, $type, $subType, $bizId)
     {
         DB::table('todos')->where([
             'uid' => $uid,
             'type' => $type,
+            'sub_type' => $subType,
             'biz_id' => $bizId,
             'status' => Todo::STATUS_PENDING,
         ])->update([
@@ -375,15 +397,12 @@ class Utils
         return true;
     }
 
-    /**
-     * 待办通过bizId取消
-     * @param $type
-     * @param $bizId
-     */
-    public static function todoCancelByBizId($type, $bizId)
+
+    public static function todoCancelByBizId($type, $subType, $bizId)
     {
         DB::table('todos')->where([
             'type' => $type,
+            'sub_type' => $subType,
             'biz_id' => $bizId,
             'status' => Todo::STATUS_PENDING,
         ])->update([
