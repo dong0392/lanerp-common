@@ -344,7 +344,7 @@ class Utils
      * @param $bizId
      * @return int
      */
-    public static function todoDone($uid, $type, $subType, $bizId)
+    public static function todoDone($uid, $type, $subType, $bizId, $operatorId = 0)
     {
         DB::table('todos')->where([
             'uid' => $uid,
@@ -353,6 +353,7 @@ class Utils
             'biz_id' => $bizId,
             'status' => 1,
         ])->update([
+            'operator_id' => $operatorId,
             'status' => 2,
             'completed_at' => now(),
             'updated_at' => now(),
@@ -360,7 +361,23 @@ class Utils
         return true;
     }
 
-    public static function todoDoneByBizId($type, $subType, $bizId)
+    public static function todoDoneMultiUser($uids, $type, $subType, $bizId, $operatorId = 0)
+    {
+        DB::table('todos')->where([
+            'type' => $type,
+            'sub_type' => $subType,
+            'biz_id' => $bizId,
+            'status' => 1,
+        ])->whereIn('uid', $uids)->update([
+            'operator_id' => $operatorId,
+            'status' => 2,
+            'completed_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return true;
+    }
+
+    public static function todoDoneByBizId($type, $subType, $bizId, $operatorId = 0)
     {
         DB::table('todos')->where([
             'type' => $type,
@@ -368,6 +385,7 @@ class Utils
             'biz_id' => $bizId,
             'status' => 1,
         ])->update([
+            'operator_id' => $operatorId,
             'status' => 2,
             'completed_at' => now(),
             'updated_at' => now(),
@@ -382,7 +400,7 @@ class Utils
      * @param $bizId
      * @return int
      */
-    public static function todoCancel($uid, $type, $subType, $bizId)
+    public static function todoCancel($uid, $type, $subType, $bizId, $operatorId = 0)
     {
         DB::table('todos')->where([
             'uid' => $uid,
@@ -391,6 +409,7 @@ class Utils
             'biz_id' => $bizId,
             'status' => 1,
         ])->update([
+            'operator_id' => $operatorId,
             'status' => 3,
             'updated_at' => now(),
         ]);
@@ -398,7 +417,7 @@ class Utils
     }
 
 
-    public static function todoCancelByBizId($type, $subType, $bizId)
+    public static function todoCancelByBizId($type, $subType, $bizId, $operatorId = 0)
     {
         DB::table('todos')->where([
             'type' => $type,
@@ -406,6 +425,7 @@ class Utils
             'biz_id' => $bizId,
             'status' => 1,
         ])->update([
+            'operator_id' => $operatorId,
             'status' => 3,
             'updated_at' => now(),
         ]);
