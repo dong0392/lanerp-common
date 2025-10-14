@@ -319,7 +319,7 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-        ])->whereIn('status', [Todo::STATUS_PENDING, Todo::STATUS_DONE])->exists();
+        ])->whereIn('status', [1, 2])->exists();
         if ($exists) {
             return false;
         }
@@ -330,7 +330,7 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-            'status' => Todo::STATUS_PENDING,
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -351,9 +351,9 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-            'status' => Todo::STATUS_PENDING,
+            'status' => 1,
         ])->update([
-            'status' => Todo::STATUS_DONE,
+            'status' => 2,
             'completed_at' => now(),
             'updated_at' => now(),
         ]);
@@ -366,9 +366,9 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-            'status' => Todo::STATUS_PENDING,
+            'status' => 1,
         ])->update([
-            'status' => Todo::STATUS_DONE,
+            'status' => 2,
             'completed_at' => now(),
             'updated_at' => now(),
         ]);
@@ -389,9 +389,9 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-            'status' => Todo::STATUS_PENDING,
+            'status' => 1,
         ])->update([
-            'status' => Todo::STATUS_CANCEL,
+            'status' => 3,
             'updated_at' => now(),
         ]);
         return true;
@@ -404,9 +404,9 @@ class Utils
             'type' => $type,
             'sub_type' => $subType,
             'biz_id' => $bizId,
-            'status' => Todo::STATUS_PENDING,
+            'status' => 1,
         ])->update([
-            'status' => Todo::STATUS_CANCEL,
+            'status' => 3,
             'updated_at' => now(),
         ]);
         return true;
