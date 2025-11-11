@@ -27,7 +27,7 @@ class Todo
         if ($exists) {
             return false;
         }
-
+        
         DB::table('todos')->insert([
             'company_id' => $companyId,
             'uid' => $uid,
@@ -136,5 +136,24 @@ class Todo
         return true;
     }
 
-
+    /**
+     * 重置
+     */
+    public static function reset($companyId, $uid, $type, $subType, $bizId, $operatorId = 0)
+    {
+        $count = DB::table('todos')->where([
+            'uid' => $uid,
+            'type' => $type,
+            'sub_type' => $subType,
+            'biz_id' => $bizId,
+        ])->whereIn('status', [2, 3])->update([
+            'operator_id' => $operatorId,
+            'status' => 1,
+            'updated_at' => now(),
+        ]);
+        if ($count == 0) {
+            return static::add($companyId, $uid, $type, $subType, $bizId);
+        }
+        return true;
+    }
 }
