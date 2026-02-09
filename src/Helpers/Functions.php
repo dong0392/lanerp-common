@@ -474,9 +474,31 @@ if (!function_exists('user')) {
 
 
 if (!function_exists('_throwException')) {
-    function _throwException($message = "", $code = -1)
+    /**
+     * Notes:业务逻辑异常抛出
+     * Date: 2026/2/9
+     * @param $message //异常消息
+     * @param $code   //异常代码
+     * @param $shouldLog //是否需要记录日志并推送消息
+     * @return mixed
+     */
+    function _throwException($message = "", $code = -1, $shouldLog = false)
     {
-        throw new \RuntimeException($message, $code);
+        throw new \lanerp\common\Exceptions\BusinessException($message, $code, $shouldLog);
+    }
+}
+
+if (!function_exists('_throw')) {
+    /**
+     * Notes:异常抛出
+     * Date: 2026/2/9
+     * @param $e //异常对象
+     * @return mixed
+     * @throws \Throwable
+     */
+    function _throw($e)
+    {
+        throw $e;
     }
 }
 
