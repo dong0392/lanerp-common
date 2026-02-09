@@ -144,8 +144,19 @@ class Utils
                 // 遍历每一列，构建 SET 子句
                 foreach ($row as $k => $v) {
                     if ($k !== $index) {
-                        $updateField[] = "`{$k}` = ?"; // 使用 ? 作为占位符
-                        $bindings[]    = $v; // 添加到绑定参数
+                        // --- 核心修改部分 ---
+                        // 判断是否为 DB::raw() 产生的表达式对象
+                        if ($v instanceof \Illuminate\Database\Query\Expression) {
+                            // 在 Laravel 10/11 中，getValue() 需要传入当前连接的 Grammar
+                            // 简单的写法是直接利用对象转换获取原始 SQL 片段
+                            $rawSql = $v->getValue(DB::connection()->getQueryGrammar());
+                            $updateField[] = "`{$k}` = {$rawSql}"; // 直接拼入 SQL，不使用占位符
+                        } else {
+                            // 普通数值或字符串，继续使用占位符安全处理
+                            $updateField[] = "`{$k}` = ?"; // 使用 ? 作为占位符
+                            $bindings[]    = $v; // 添加到绑定参数
+                        }
+                        // --------------------
                     }
                 }
                 // 确保包含主键字段
