@@ -27,7 +27,7 @@ class ExceptionRender
             $isValidation = $e instanceof \Illuminate\Validation\ValidationException;
             // 只有 (非业务且非验证) 或者 (强制要求记录的业务异常) 才发飞书
             if ((!$isBusiness && !$isValidation) || ($isBusiness && $e->shouldLog)) {
-                \App\Exceptions\ExceptionNotice::feiShu($e->getCode(), $e->getMessage());
+                \lanerp\common\Exceptions\ExceptionNotice::feiShu($e->getCode(), $e->getMessage());
             }
             // 2. 情况 A：参数验证失败
             if ($e instanceof \Illuminate\Validation\ValidationException) {
