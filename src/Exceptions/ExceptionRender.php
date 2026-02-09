@@ -23,7 +23,7 @@ class ExceptionRender
             //dd(2222);
             // 1. 处理飞书通知
             // 逻辑：如果是系统错误 (Error) 或 明确要求记录的异常，则发飞书
-            $isBusiness   = $e instanceof \App\Exceptions\BusinessException;
+            $isBusiness   = $e instanceof \lanerp\common\Exceptions\BusinessException;
             $isValidation = $e instanceof \Illuminate\Validation\ValidationException;
             // 只有 (非业务且非验证) 或者 (强制要求记录的业务异常) 才发飞书
             if ((!$isBusiness && !$isValidation) || ($isBusiness && $e->shouldLog)) {
@@ -39,7 +39,7 @@ class ExceptionRender
                 ], 422);
             }
             // 3. 情况 B：手动抛出的业务异常
-            if ($e instanceof \App\Exceptions\BusinessException) {
+            if ($e instanceof \lanerp\common\Exceptions\BusinessException) {
                 return responseErr($e->getMessage(), $e->getCode());
             }
 
