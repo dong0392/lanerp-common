@@ -17,10 +17,8 @@ class ExceptionRender
             return true;
         });
 
-        //dd(1111);
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
 
-            //dd(2222);
             // 1. 处理飞书通知
             // 逻辑：如果是系统错误 (Error) 或 明确要求记录的异常，则发飞书
             $isBusiness   = $e instanceof \lanerp\common\Exceptions\BusinessException;
