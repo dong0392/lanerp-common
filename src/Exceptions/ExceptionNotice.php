@@ -11,6 +11,10 @@ class ExceptionNotice
 
     public static function feiShu($code, $message)
     {
+        if (config('app.env') !== 'prod') {
+            return; // 仅在生产环境发送通知
+        }
+
         $webhook = self::$alarmUrl . env('FEISHU_ALARM_BOT_KEY');
 
         try {
