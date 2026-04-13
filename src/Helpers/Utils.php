@@ -232,7 +232,7 @@ class Utils
 
         /* @var Client $redis */
         $redis = Redis::connection();
-        $redis->select(10);
+        //$redis->select(10);
         $isSleep = false;
         //将查询年份日期数据插入到redis
         for ($year = $startYear; $year <= $endYear; $year++) {
@@ -304,7 +304,7 @@ class Utils
     {
         /* @var Client $redis */
         $redis = Redis::connection();
-        $redis->select(10);
+        //$redis->select(10);
         $redisKey = "export:" . request()->route('key');
         if (!$data = $redis->get($redisKey)) {
             _throwException("密匙已失效，请重新导出。");
