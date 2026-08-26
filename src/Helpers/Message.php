@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class Message
 {
 
-    public static function setReadByTemplate($templateEnName, $relateId, $uids)
+    public static function setReadByTemplate($templateEnName, $relateId, $uids, $operationStatus = null)
     {
 
         if (!is_array($uids)) {
@@ -21,13 +21,18 @@ class Message
         if (!$templateId) {
             return false;
         }
+        $updates = [
+            'status' => 'read',
+            'updated_at' => now(),
+        ];
+        if ($operationStatus !== null) {
+            $updates['operation_status'] = $operationStatus;
+        }
+
         DB::table('message_record_user')->where([
             'template_id' => $templateId,
             'relate_id' => $relateId,
-        ])->whereIn('uid', $uids)->update([
-            'status' => 'read',
-            'updated_at' => now(),
-        ]);
+        ])->whereIn('uid', $uids)->update($updates);
         return true;
     }
 
